@@ -3,24 +3,21 @@ package main
 import (
 	"errors"
 	"fmt"
-	"log"
+	"os"
 	"strings"
 	"sync"
+
+	logpkg "list-buildings/log"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
-func main() {
-	go func() {
-		for e := range errorsC {
-			writeErrorToFile(e)
-			log.Println(e.Error())
-		}
-	}()
+var log = logpkg.New("errors.log")
 
+func main() {
 	doc, err := tryGetDoc("https://realt.by/buildings/?utm_source=h-menu&utm_medium=menu&utm_campaign=menu")
 	if err != nil {
-		log.Fatal(err)
+		os.Exit(1)
 	}
 
 	buildings := make(chan *Building, 100)

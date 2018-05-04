@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"time"
@@ -12,8 +11,6 @@ import (
 )
 
 var getSync = make(chan int, 15)
-
-var errorsC = make(chan error, 100)
 
 func getDoc(urlS string) (*goquery.Document, error) {
 	getSync <- 1
@@ -51,7 +48,7 @@ func tryGetDoc(url string) (*goquery.Document, error) {
 	}
 
 	if err != nil {
-		errorsC <- fmt.Errorf("couldn't load %s: %s", url, err)
+		log.Error(fmt.Errorf("couldn't load %s: %s", url, err))
 	}
 
 	return doc, err
@@ -60,21 +57,11 @@ func tryGetDoc(url string) (*goquery.Document, error) {
 func writeDataToFile(b *Building) {
 	f, err := os.OpenFile("buildings.csv", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
+		os.Exit(1)
 	}
 	defer f.Close()
 
 	f.WriteString(fmt.Sprintf("%s,%s,%s\n", b.Street, b.Building, b.URL))
-	f.Sync()
-}
-
-func writeErrorToFile(e error) {
-	f, err := os.OpenFile("errors.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer f.Close()
-
-	f.WriteString(fmt.Sprintf("%s\n", e.Error()))
 	f.Sync()
 }
