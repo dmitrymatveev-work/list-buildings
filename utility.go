@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/PuerkitoBio/goquery"
@@ -52,16 +51,4 @@ func tryGetDoc(url string) (*goquery.Document, error) {
 	}
 
 	return doc, err
-}
-
-func writeDataToFile(b *Building) {
-	f, err := os.OpenFile("buildings.csv", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		log.Error(err)
-		os.Exit(1)
-	}
-	defer f.Close()
-
-	f.WriteString(fmt.Sprintf("%s,%s,%s\n", b.Street, b.Building, b.URL))
-	f.Sync()
 }

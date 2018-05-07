@@ -8,19 +8,24 @@ import (
 	"sync"
 
 	logpkg "list-buildings/log"
+	"list-buildings/model"
+	reportpkg "list-buildings/report"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
 var log = logpkg.New("errors.log")
+var report *reportpkg.Report
 
 func main() {
+	report = reportpkg.New("buildings.csv", log)
+
 	doc, err := tryGetDoc("https://realt.by/buildings/?utm_source=h-menu&utm_medium=menu&utm_campaign=menu")
 	if err != nil {
 		os.Exit(1)
 	}
 
-	buildings := make(chan *Building, 100)
+	buildings := make(chan *model.Building, 100)
 
 	streets := doc.Find("#sub-menu-content-lists .archive-street-list li a")
 
@@ -42,12 +47,12 @@ func main() {
 	}()
 
 	for b := range buildings {
-		writeDataToFile(b)
+		report.Write(b)
 		fmt.Println(b)
 	}
 }
 
-func processStreet(url string, buildings chan<- *Building, wg *sync.WaitGroup) {
+func processStreet(url string, buildings chan<- *model.Building, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	doc, err := tryGetDoc(url)
@@ -70,7 +75,7 @@ func processStreet(url string, buildings chan<- *Building, wg *sync.WaitGroup) {
 		})
 }
 
-func getBuilding(url string) (*Building, error) {
+func getBuilding(url string) (*model.Building, error) {
 	doc, err := tryGetDoc(url)
 	if err != nil {
 		return nil, err
@@ -92,7 +97,7 @@ func getBuilding(url string) (*Building, error) {
 		return nil, errors.New("doesn't match")
 	}
 
-	building := Building{}
+	building := model.Building{}
 	doc.Find("#c39380 div.bread-content > p > a").
 		Each(func(i int, s *goquery.Selection) {
 			switch i {

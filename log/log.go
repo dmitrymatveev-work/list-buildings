@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-// Log type that implements log functionality
+// Log is the type that implements log functionality
 type Log struct {
 	errors   chan error
 	filePath string
