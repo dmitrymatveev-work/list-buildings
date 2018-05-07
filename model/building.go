@@ -6,10 +6,11 @@ import (
 
 // Building is the type containing information about a building
 type Building struct {
-	Street   string
-	Building string
-	URL      string
-	IsBrick  bool
+	Street      string
+	Building    string
+	URL         string
+	IsBrick     bool
+	IsApartment bool
 }
 
 func (b Building) String() string {
