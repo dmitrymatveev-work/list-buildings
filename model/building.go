@@ -9,6 +9,7 @@ type Building struct {
 	Street   string
 	Building string
 	URL      string
+	IsBrick  bool
 }
 
 func (b Building) String() string {
