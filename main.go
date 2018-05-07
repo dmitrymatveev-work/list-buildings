@@ -10,17 +10,20 @@ import (
 	logpkg "list-buildings/log"
 	"list-buildings/model"
 	reportpkg "list-buildings/report"
+	"list-buildings/web"
 
 	"github.com/PuerkitoBio/goquery"
 )
 
 var log = logpkg.New("errors.log")
 var report *reportpkg.Report
+var webClient *web.Client
 
 func main() {
 	report = reportpkg.New("buildings.csv", log)
+	webClient = web.NewClient(log)
 
-	doc, err := tryGetDoc("https://realt.by/buildings/?utm_source=h-menu&utm_medium=menu&utm_campaign=menu")
+	doc, err := webClient.TryGetDoc("https://realt.by/buildings/?utm_source=h-menu&utm_medium=menu&utm_campaign=menu")
 	if err != nil {
 		os.Exit(1)
 	}
@@ -55,7 +58,7 @@ func main() {
 func processStreet(url string, buildings chan<- *model.Building, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	doc, err := tryGetDoc(url)
+	doc, err := webClient.TryGetDoc(url)
 	if err != nil {
 		return
 	}
@@ -76,7 +79,7 @@ func processStreet(url string, buildings chan<- *model.Building, wg *sync.WaitGr
 }
 
 func getBuilding(url string) (*model.Building, error) {
-	doc, err := tryGetDoc(url)
+	doc, err := webClient.TryGetDoc(url)
 	if err != nil {
 		return nil, err
 	}
