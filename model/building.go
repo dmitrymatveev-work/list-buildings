@@ -1,4 +1,4 @@
-package main
+package model
 
 import (
 	"fmt"
@@ -6,9 +6,11 @@ import (
 
 // Building is the type containing information about a building
 type Building struct {
-	Street   string
-	Building string
-	URL      string
+	Street      string
+	Building    string
+	URL         string
+	IsBrick     bool
+	IsApartment bool
 }
 
 func (b Building) String() string {
