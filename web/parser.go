@@ -7,24 +7,11 @@ import (
 	"github.com/PuerkitoBio/goquery"
 )
 
-// ObtainStreetURLs method obtains street page URLs from a document
-func ObtainStreetURLs(doc *goquery.Document) (urls []string) {
+// ObtainURLs method obtains page URLs from a document
+func ObtainURLs(doc *goquery.Document, selector string) (urls []string) {
 	urls = make([]string, 0)
 	doc.
-		Find("#sub-menu-content-lists .archive-street-list li a").
-		Each(func(i int, s *goquery.Selection) {
-			if url, ok := s.Attr("href"); ok {
-				urls = append(urls, url)
-			}
-		})
-	return
-}
-
-// ObtainBuildingURLs method obtains building page URLs from a document
-func ObtainBuildingURLs(doc *goquery.Document) (urls []string) {
-	urls = make([]string, 0)
-	doc.
-		Find("div.wiki div.wiki-left-item > a:last-of-type").
+		Find(selector).
 		Each(func(i int, s *goquery.Selection) {
 			if url, ok := s.Attr("href"); ok {
 				urls = append(urls, url)

@@ -21,12 +21,16 @@ func main() {
 		os.Exit(1)
 	}
 
-	streetURLs := web.ObtainStreetURLs(streetsDoc)
+	streetSelector := "#sub-menu-content-lists .archive-street-list li a"
+
+	streetURLs := web.ObtainURLs(streetsDoc, streetSelector)
 
 	var wg sync.WaitGroup
 	wg.Add(len(streetURLs))
 
 	buildings := make(chan *model.Building, 100)
+
+	buildingSelector := "div.wiki div.wiki-left-item > a:last-of-type"
 
 	for _, streetURL := range streetURLs {
 		go func(streetURL string) {
@@ -37,7 +41,7 @@ func main() {
 				return
 			}
 
-			buildingURLs := web.ObtainBuildingURLs(streetDoc)
+			buildingURLs := web.ObtainURLs(streetDoc, buildingSelector)
 
 			for _, buildingURL := range buildingURLs {
 				buildingDoc, err := webClient.TryGetDoc(buildingURL)
